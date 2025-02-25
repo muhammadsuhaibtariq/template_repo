@@ -3,7 +3,7 @@ name: SonarLint
 on:
   pull_request:
     branches:
-      - develop
+      - dev
 
 jobs:
   detect-changes:
