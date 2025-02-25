@@ -27,7 +27,7 @@ jobs:
         run: |
           FRONTEND_CHANGED=false
           BACKEND_CHANGED=false
-          CHANGED_FILES=$(git diff --name-only origin/develop ${{ github.sha }})
+          CHANGED_FILES=$(git diff --name-only origin/dev ${{ github.sha }})
           echo "Changed files:"
           echo "$CHANGED_FILES"
           if echo "$CHANGED_FILES" | grep -q '^frontend/'; then
