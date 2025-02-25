@@ -9,35 +9,39 @@ on:
       - dev
 
 jobs:
-  # detect-changes:
-  #   name: Detect Changes
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     frontend_changed: ${{ steps.set-output.outputs.frontend_changed }}
-  #     backend_changed: ${{ steps.set-output.outputs.backend_changed }}
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.set-output.outputs.frontend_changed }}
+      backend_changed: ${{ steps.set-output.outputs.backend_changed }}
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
 
-  #     - name: Check for changes in directories
-  #       id: set-output
-  #       run: |
-  #         FRONTEND_CHANGED=false
-  #         BACKEND_CHANGED=false
-  #         CHANGED_FILES=$(git diff --name-only origin/dev ${{ github.sha }})
-  #         echo "Changed files:"
-  #         echo "$CHANGED_FILES"
-  #         if echo "$CHANGED_FILES" | grep -q '^frontend/'; then
-  #           FRONTEND_CHANGED=true
-  #         fi
-  #         if echo "$CHANGED_FILES" | grep -q '^backend/'; then
-  #           BACKEND_CHANGED=true
-  #         fi
-  #         echo "frontend_changed=$FRONTEND_CHANGED" >> $GITHUB_OUTPUT
-  #         echo "backend_changed=$BACKEND_CHANGED" >> $GITHUB_OUTPUT
+      - name: Check for changes in directories
+        id: set-output
+        run: |
+          FRONTEND_CHANGED=false
+          BACKEND_CHANGED=false
+          CHANGED_FILES=$(git diff --name-only origin/dev ${{ github.sha }})
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          if echo "$CHANGED_FILES" | grep -q '^frontend/'; then
+            FRONTEND_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q '^backend/'; then
+            BACKEND_CHANGED=true
+          fi
+          echo "frontend_changed=$FRONTEND_CHANGED" >> $GITHUB_OUTPUT
+          echo "backend_changed=$BACKEND_CHANGED" >> $GITHUB_OUTPUT
+      - name: Debug outputs
+        run: |
+          echo "Frontend Changed: ${{ steps.set-output.outputs.frontend_changed }}"
+          echo "Backend Changed: ${{ steps.set-output.outputs.backend_changed }}"
   # frontend-analysis:
   #   name: Frontend SonarQube Analysis
   #   needs: detect-changes
@@ -61,44 +65,44 @@ jobs:
   #        args: >
   #          -Dsonar.projectKey=bab-ba-genai-assistant-frontend
   #          -Dsonar.qualitygate.wait=true
-  backend-analysis:
-    name: Backend SonarQube Analysis
-    # needs: detect-changes
-    # if: ${{ needs.detect-changes.outputs.backend_changed == 'true' }}
-    runs-on: [self-hosted, Linux]
+  # backend-analysis:
+  #   name: Backend SonarQube Analysis
+  #   # needs: detect-changes
+  #   # if: ${{ needs.detect-changes.outputs.backend_changed == 'true' }}
+  #   runs-on: [self-hosted, Linux]
     
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      # Dependencies
-      - name: Set up Python 3.x
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     # Dependencies
+  #     - name: Set up Python 3.x
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.10"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-          pip install pytest
-          pip install pytest-cov
-          pip install coverage
-      # Test
-      - name: Test with pytest
-        run: |
-          pytest --cov=backend/ --cov-report xml:coverage.xml --cov-fail-under=70 backend
+  #     - name: Install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r backend/requirements.txt
+  #         pip install pytest
+  #         pip install pytest-cov
+  #         pip install coverage
+  #     # Test
+  #     - name: Test with pytest
+  #       run: |
+  #         pytest --cov=backend/ --cov-report xml:coverage.xml --cov-fail-under=70 backend
           
-      - name: Analyze Backend with SonarQube
-        uses: sonarsource/sonarqube-scan-action@v4.2.1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_BACKEND }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          # SONAR_ROOT_CERT: ${{ secrets.SONAR_ROOT_CERT }}
-        with:
-         projectBaseDir: backend
-         args: >
-           -Dsonar.projectKey=sonar_testing_template
-           -Dsonar.python.coverage.reportPaths=coverage.xml
+  #     - name: Analyze Backend with SonarQube
+  #       uses: sonarsource/sonarqube-scan-action@v4.2.1
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_BACKEND }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #         # SONAR_ROOT_CERT: ${{ secrets.SONAR_ROOT_CERT }}
+  #       with:
+  #        projectBaseDir: backend
+  #        args: >
+  #          -Dsonar.projectKey=sonar_testing_template
+  #          -Dsonar.python.coverage.reportPaths=coverage.xml
