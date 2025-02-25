@@ -63,7 +63,7 @@ jobs:
   #          -Dsonar.qualitygate.wait=true
   backend-analysis:
     name: Backend SonarQube Analysis
-    needs: detect-changes
+    # needs: detect-changes
     if: ${{ needs.detect-changes.outputs.backend_changed == 'true' }}
     runs-on: [self-hosted, ubuntu-bionic]
     
