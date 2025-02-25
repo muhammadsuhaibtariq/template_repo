@@ -65,7 +65,7 @@ jobs:
     name: Backend SonarQube Analysis
     # needs: detect-changes
     # if: ${{ needs.detect-changes.outputs.backend_changed == 'true' }}
-    runs-on: [self-hosted, ubuntu-bionic]
+    runs-on: [self-hosted, Linux]
     
 
     steps:
