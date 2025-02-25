@@ -100,5 +100,5 @@ jobs:
         with:
          projectBaseDir: backend
          args: >
-           -Dsonar.projectKey=Devops-template
+           -Dsonar.projectKey=sonar_testing_template
            -Dsonar.python.coverage.reportPaths=coverage.xml
